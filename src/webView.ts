@@ -1,12 +1,17 @@
 import * as vscode from 'vscode';
+import { SvelteWebviewInitialiser } from './svelteWebviewInitialiser';
 
 export class WebView implements vscode.Disposable {
     private panel:vscode.WebviewPanel;
+    private svelteWebviewInitializer: SvelteWebviewInitialiser;
 
-    constructor(protected context: vscode.ExtensionContext, private viewType: string, title: string) {
+    constructor(protected context: vscode.ExtensionContext, private view: string, title: string) {
+        
+        this.svelteWebviewInitializer = new SvelteWebviewInitialiser(context);
+
         this.panel = this.createPanel(title);
 
-        this.updatePanel();
+        this.svelteWebviewInitializer.initialize(this.view, this.panel.webview);
     }
 
     dispose() {
@@ -18,13 +23,8 @@ export class WebView implements vscode.Disposable {
         this.panel.reveal();
     }
 
-    protected getHtmlContent(): string {
-        return `
-        <html>
-            <body>
-                This is something interesting!!!
-            </body>
-        </html>`;
+    setTitle(title: string) {
+        this.panel.title = title;
     }
     
     private createPanel(title: string): vscode.WebviewPanel {
@@ -33,24 +33,9 @@ export class WebView implements vscode.Disposable {
         : vscode.ViewColumn.Active;
 
         return vscode.window.createWebviewPanel(
-            this.viewType,
+            this.view,
             title,
-            column,
-            this.getWebViewOptions()
+            column
         );
-    }
-
-    private getWebViewOptions(): (vscode.WebviewPanelOptions & vscode.WebviewOptions) {
-        return {
-            // Enable javascript in the webview
-            enableScripts: true,
-
-            // And restrict the webview to only loading content from our extension's `media` directory.
-            localResourceRoots: [vscode.Uri.joinPath(this.context.extensionUri, 'media')]
-	    };
-    }
-
-    private updatePanel() {
-        this.panel.webview.html = this.getHtmlContent();
     }
 }

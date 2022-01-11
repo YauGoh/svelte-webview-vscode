@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const { WatchIgnorePlugin } = require('webpack');
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
@@ -44,5 +45,14 @@ const extensionConfig = {
   infrastructureLogging: {
     level: "log", // enables logging required for problem matchers
   },
+  plugins: [
+    new WatchIgnorePlugin(
+      {
+        paths: [
+          path.resolve(__dirname, 'svelte')
+        ]
+      }
+    ),
+  ]
 };
 module.exports = [ extensionConfig ];
