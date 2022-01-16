@@ -6,7 +6,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	console.log('Congratulations, your extension "svelte-webview" is now active!');
 
-	const explorer = new WebviewViewProvider(context, "sample");
+	const explorer = new WebviewViewProvider(context, "somethingExplorer");
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider("svelte-webview.explorer", explorer)

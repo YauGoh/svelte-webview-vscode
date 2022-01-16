@@ -16,6 +16,7 @@ export class SvelteWebviewInitialiser {
         const nonce = this.getNonce();
 
         const scriptUri = this.getSvelteAppDistributionIndexJsUri(context, view)
+        const stylesUri = this.getStylesUri(context);
 
         return `
 <!DOCTYPE html>
@@ -23,11 +24,12 @@ export class SvelteWebviewInitialiser {
     <head>
         <meta charset='utf-8'>
         <meta name='viewport' content='width=device-width,initial-scale=1'>
+        <link href="${stylesUri}" rel="stylesheet" />
     </head>
 
     <body>
     </body>
-    <script nonce="${nonce}" src="${scriptUri}"></script>
+    <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
 </html>
 `;
     }
@@ -45,12 +47,17 @@ export class SvelteWebviewInitialiser {
         return {
             enableScripts: true,
             localResourceRoots: [
-                this.getSvelteAppDistributionFolderUri(context, view)
+                this.getSvelteAppDistributionFolderUri(context),
+                this.getSvelteAppDistributionViewFolderUri(context, view)
             ]
 	    };
     }
 
-    private getSvelteAppDistributionFolderUri(context: vscode.ExtensionContext, view: string): vscode.Uri {
+    private getSvelteAppDistributionFolderUri(context: vscode.ExtensionContext): vscode.Uri {
+        return vscode.Uri.joinPath(context.extensionUri, 'svelte', 'dist');
+    }
+
+    private getSvelteAppDistributionViewFolderUri(context: vscode.ExtensionContext, view: string): vscode.Uri {
         return vscode.Uri.joinPath(context.extensionUri, 'svelte', 'dist', 'views', view);
     }
 
@@ -58,5 +65,10 @@ export class SvelteWebviewInitialiser {
         return  vscode.Uri
             .joinPath(context.extensionUri, 'svelte', 'dist', 'views', view, 'index.js')
             .with({ 'scheme': 'vscode-resource' });
+    }
+
+    getStylesUri(context: vscode.ExtensionContext) {
+        return  vscode.Uri
+        .joinPath(context.extensionUri, 'svelte', 'dist', 'styles.css')
     }
 }
